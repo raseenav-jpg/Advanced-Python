@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // REPLACE THESE with your actual values from Supabase Project Settings > API
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Rename the global variable to avoid conflict with the library name 'supabase'
+        window.supabase = supabaseClient;
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Portal</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0e0e12;
+            --surface: #16161d;
+            --card: #1c1c26;
+            --border: #2a2a38;
+            --accent: #6c63ff;
+            --accent2: #ff6584;
+            --text: #e8e8f0;
+            --muted: #7a7a96;
+            --success: #43e97b;
+            --error: #ff6b6b;
+            --admin: #f7971e;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background blobs */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.18;
+            animation: float 8s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 500px;
+            height: 500px;
+            background: var(--accent);
+            top: -150px;
+            left: -150px;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: var(--accent2);
+            bottom: -120px;
+            right: -100px;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(40px, 30px) scale(1.1);
+            }
+        }
+
+        /* Main card */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px 44px;
+            width: 100%;
+            max-width: 460px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Role toggle */
+        .role-toggle {
+            display: flex;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .role-btn.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(108, 99, 255, 0.35);
+        }
+
+        .role-btn.active.admin-active {
+            background: var(--admin);
+            box-shadow: 0 4px 16px rgba(247, 151, 30, 0.35);
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+
+        .header p {
+            font-size: 13.5px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .accent-dot {
+            color: var(--accent);
+        }
+
+        .admin-mode .accent-dot {
+            color: var(--admin);
+        }
+
+        /* Form fields */
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+
+        .field-wrap {
+            position: relative;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 13px 16px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+        }
+
+        .admin-mode .field input:focus,
+        .admin-mode .field select:focus {
+            border-color: var(--admin);
+            box-shadow: 0 0 0 3px rgba(247, 151, 30, 0.15);
+        }
+
+        .field input.error-field {
+            border-color: var(--error);
+        }
+
+        .field select option {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        /* Phone prefix */
+        .phone-wrap {
+            display: flex;
+            gap: 8px;
+        }
+
+        .prefix-box {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 13px 14px;
+            color: var(--muted);
+            font-size: 15px;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .phone-wrap input {
+            flex: 1;
+        }
+
+        /* Password toggle icon */
+        .toggle-pw {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--muted);
+            background: none;
+            border: none;
+            font-size: 18px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .toggle-pw:hover {
+            color: var(--text);
+        }
+
+        /* Password strength bar */
+        .pw-strength {
+            margin-top: 6px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .pw-bar {
+            flex: 1;
+            height: 3px;
+            border-radius: 2px;
+            background: var(--border);
+            transition: background 0.3s;
+        }
+
+        .pw-bar.weak {
+            background: var(--error);
+        }
+
+        .pw-bar.medium {
+            background: #f7971e;
+        }
+
+        .pw-bar.strong {
+            background: var(--success);
+        }
+
+        /* Error messages */
+        .err {
+            font-size: 12px;
+            color: var(--error);
+            margin-top: 5px;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .err.show {
+            display: flex;
+        }
+
+        /* Select arrow */
+        .select-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            pointer-events: none;
+            font-size: 14px;
+        }
+
+        .select-wrap {
+            position: relative;
+        }
+
+        /* Submit button */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: var(--accent);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            letter-spacing: 0.2px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.4);
+        }
+
+        .admin-mode .btn {
+            background: var(--admin);
+            box-shadow: 0 4px 20px rgba(247, 151, 30, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(108, 99, 255, 0.45);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.08);
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .btn:hover::after {
+            opacity: 1;
+        }
+
+        /* Success panel */
+        .success-panel {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 0 8px;
+            animation: fadeIn 0.4s ease both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .check-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(67, 233, 123, 0.12);
+            border: 2px solid var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .success-panel h2 {
+            font-family: 'DM Serif Display';
+            font-size: 22px;
+            font-weight: 400;
+        }
+
+        .success-panel p {
+            font-size: 13.5px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .user-data-table {
+            width: 100%;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            margin-top: 8px;
+        }
+
+        .user-data-table .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13.5px;
+        }
+
+        .user-data-table .row:last-child {
+            border-bottom: none;
+        }
+
+        .user-data-table .key {
+            color: var(--muted);
+        }
+
+        .user-data-table .val {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(108, 99, 255, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.admin-badge {
+            background: rgba(247, 151, 30, 0.15);
+            color: var(--admin);
+            border-color: rgba(247, 151, 30, 0.3);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 22px 0 18px;
+        }
+
+        .link-row {
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        .link-row a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .admin-mode .link-row a {
+            color: var(--admin);
+        }
+
+        /* Admin note */
+        .admin-note {
+            display: none;
+            background: rgba(247, 151, 30, 0.08);
+            border: 1px solid rgba(247, 151, 30, 0.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12.5px;
+            color: #f7971e;
+            margin-bottom: 20px;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .admin-note.show {
+            display: flex;
+        }
+    </style>
+    </style>
+</head>
+
+            <body>
+
+                <div class="card" id="mainCard">
+
+        <!-- Role toggle -->
+                    <div class="role-toggle">
+                        <button class="role-btn active" id="userBtn" onclick="setRole('user')">👤 User</button>
+                        <button class="role-btn" id="adminBtn" onclick="setRole('admin')">🛡️ Admin</button>
+                    </div>
+
+                    <!-- Header -->
+                    <div class="header">
+                        <h1>Welcome back<span class="accent-dot">.</span></h1>
+                        <p id="subText">Sign in to your account to continue</p>
+                    </div>
+
+                    <!-- Admin note -->
+                    <div class="admin-note" id="adminNote">
+                        ⚠️ Admin access grants full visibility into all registered user data. Use responsibly.
+                    </div>
+
+                    <!-- Form -->
+                    <form id="loginForm" novalidate>
+
+                        <!-- Email -->
+                        <div class="field">
+                            <label>Email Address</label>
+                            <div class="field-wrap">
+                                <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+                            </div>
+                            <div class="err" id="emailErr">⚠ Please enter a valid email address</div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="field">
+                            <label>Password</label>
+                            <div class="field-wrap">
+                                <input type="password" id="password" placeholder="Min 8 chars, 1 symbol"
+                                    autocomplete="current-password" />
+                                <button type="button" class="toggle-pw" onclick="togglePw()" id="pwEye">👁</button>
+                            </div>
+                            <div class="pw-strength" id="pwStrength">
+                                <div class="pw-bar" id="bar1"></div>
+                                <div class="pw-bar" id="bar2"></div>
+                                <div class="pw-bar" id="bar3"></div>
+                            </div>
+                            <div class="err" id="pwErr">⚠ Min 8 characters with at least one symbol (!@#$...)</div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="field">
+                            <label>Phone Number</label>
+                            <div class="phone-wrap">
+                                <div class="prefix-box">🇮🇳 +91</div>
+                                <input type="tel" id="phone" placeholder="10-digit number" maxlength="10" />
+                            </div>
+                            <div class="err" id="phoneErr">⚠ Enter a valid 10-digit phone number</div>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="field">
+                            <label>Gender</label>
+                            <div class="select-wrap field-wrap">
+                                <select id="gender">
+                                    <option value="">— Select gender —</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="non-binary">Non-binary</option>
+                                    <option value="prefer-not">Prefer not to say</option>
+                                </select>
+                            </div>
+                            <div class="err" id="genderErr">⚠ Please select your gender</div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <button type="submit" class="btn" id="submitBtn">Sign In</button>
+                    </form>
+
+                    <div class="link-row">Don't have an account? <a href="#">Create one →</a></div>
+
+                    <!-- Success panel (hidden initially) -->
+                    <div class="success-panel" id="successPanel">
+                        <div class="check-circle">✓</div>
+                        <h2 id="successTitle">Signed In!</h2>
+                        <p id="successMsg">You have been authenticated successfully.</p>
+                        <!-- Admin data table (only shown for admin) -->
+                        <div class="user-data-table" id="userDataTable" style="display:none;">
+                            <div class="row"><span class="key">Email</span><span class="val" id="dEmail">—</span></div>
+                            <div class="row"><span class="key">Phone</span><span class="val" id="dPhone">—</span></div>
+                            <div class="row"><span class="key">Gender</span><span class="val" id="dGender">—</span></div>
+                            <div class="row"><span class="key">Role</span><span class="val"><span
+                                class="badge admin-badge">Admin</span></span></div>
+                            <div class="row"><span class="key">Login Time</span><span class="val" id="dTime">—</span></div>
+                        </div>
+                        <button class="btn" style="margin-top:16px; width:100%;" onclick="resetForm()">← Back to Login</button>
+                    </div>
+
+                </div>
+
+                <script>
+                    let currentRole = 'user';
+
+                    function setRole(role) {
+                        currentRole = role;
+                    const card = document.getElementById('mainCard');
+                    const note = document.getElementById('adminNote');
+                    const uBtn = document.getElementById('userBtn');
+                    const aBtn = document.getElementById('adminBtn');
+                    const sub = document.getElementById('subText');
+
+                    if (role === 'admin') {
+                        card.classList.add('admin-mode');
+                    note.classList.add('show');
+                    aBtn.classList.add('active', 'admin-active');
+                    uBtn.classList.remove('active');
+                    sub.textContent = 'Admin portal — full user data access';
+            } else {
+                        card.classList.remove('admin-mode');
+                    note.classList.remove('show');
+                    uBtn.classList.add('active');
+                    aBtn.classList.remove('active', 'admin-active');
+                    sub.textContent = 'Sign in to your account to continue';
+            }
+        }
+
+                    // Password visibility
+                    function togglePw() {
+            const pw = document.getElementById('password');
+                    const eye = document.getElementById('pwEye');
+                    pw.type = pw.type === 'password' ? 'text' : 'password';
+                    eye.textContent = pw.type === 'password' ? '👁' : '🙈';
+        }
+
+                    // Password strength indicator
+                    document.getElementById('password').addEventListener('input', function () {
+            const val = this.value;
+            const hasLen = val.length >= 8;
+                    const hasSymbol = /[!@#$%^&*(),.?":{ }|<>\-_=+\[\]\\\/~`]/.test(val);
+                        const hasNum = /\d/.test(val);
+                        const hasUpper = /[A-Z]/.test(val);
+
+                        const score = [hasLen, hasSymbol, hasNum && hasUpper].filter(Boolean).length;
+                        const bars = ['bar1', 'bar2', 'bar3'];
+                        const cls = ['weak', 'medium', 'strong'];
+
+            bars.forEach((id, i) => {
+                const el = document.getElementById(id);
+                        el.className = 'pw-bar';
+                        if (i < score) el.classList.add(cls[score - 1]);
+            });
+        });
+
+                        // Phone: digits only
+                        document.getElementById('phone').addEventListener('input', function () {
+                            this.value = this.value.replace(/\D/g, '').slice(0, 10);
+        });
+
+                        // Validation helpers
+                        function showErr(id, show) {
+            const el = document.getElementById(id);
+                        show ? el.classList.add('show') : el.classList.remove('show');
+        }
+                        function markField(fieldId, isError) {
+            const el = document.getElementById(fieldId);
+                        isError ? el.classList.add('error-field') : el.classList.remove('error-field');
+        }
+
+                        function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+                        function validatePassword(v) { return v.length >= 8 && /[!@#$%^&*(),.?":{ }|<>\-_=+\[\]\\\/~`]/.test(v); }
+                            function validatePhone(v) { return /^\d{10}$/.test(v); }
+
+
+
+                            function resetForm() {
+                                document.getElementById('loginForm').style.display = '';
+                            document.querySelector('.link-row').style.display = '';
+                            document.querySelector('.role-toggle').style.display = '';
+                            document.getElementById('successPanel').style.display = 'none';
+                            document.getElementById('loginForm').reset();
+            document.querySelectorAll('.pw-bar').forEach(b => b.className = 'pw-bar');
+                            setRole(currentRole);
+        }
+    </script>
+
+    <!-- Link External Logic Files -->
+    <script src="login.js"></script>
+    <script src="register.js"></script>
+    </body>
+
+</html>
