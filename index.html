@@ -605,7 +605,7 @@
                         <button type="submit" class="btn" id="submitBtn">Sign In</button>
                     </form>
 
-                    <div class="link-row">Don't have an account? <a href="#">Create one →</a></div>
+                    <div class="link-row" id="toggleRow">Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Create one →</a></div>
 
                     <!-- Success panel (hidden initially) -->
                     <div class="success-panel" id="successPanel">
@@ -696,7 +696,28 @@
 
                         function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
                         function validatePassword(v) { return v.length >= 8 && /[!@#$%^&*(),.?":{ }|<>\-_=+\[\]\\\/~`]/.test(v); }
-                            function validatePhone(v) { return /^\d{10}$/.test(v); }
+                        function validatePhone(v) { return /^\d{10}$/.test(v); }
+
+                    let isRegisterMode = false;
+                    function toggleAuthMode() {
+                        isRegisterMode = !isRegisterMode;
+                        const submitBtn = document.getElementById('submitBtn');
+                        const toggleRow = document.getElementById('toggleRow');
+                        const headerTitle = document.querySelector('.header h1');
+                        const headerSub = document.getElementById('subText');
+
+                        if (isRegisterMode) {
+                            submitBtn.textContent = 'Create Account';
+                            toggleRow.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Sign In →</a>';
+                            headerTitle.innerHTML = 'Join us<span class="accent-dot">.</span>';
+                            headerSub.textContent = 'Enter your details to create an account';
+                        } else {
+                            submitBtn.textContent = 'Sign In';
+                            toggleRow.innerHTML = 'Don\'t have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Create one →</a>';
+                            headerTitle.innerHTML = 'Welcome back<span class="accent-dot">.</span>';
+                            headerSub.textContent = 'Sign in to your account to continue';
+                        }
+                    }
 
 
 
