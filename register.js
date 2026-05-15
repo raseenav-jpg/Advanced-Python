@@ -42,18 +42,40 @@ async function signUpUser(email, password, phone, gender) {
 
             if (profileError) {
                 console.error("❌ DATABASE INSERT ERROR:", profileError.message);
-                console.warn("ℹ️ Tip: Check if 'profiles' table exists and RLS allows inserts.");
-                alert("Auth successful, but could not save profile to database: " + profileError.message);
+                alert("Auth successful, but profile could not be saved: " + profileError.message);
             } else {
                 console.log("🎉 Registration completely successful!");
-                alert("Registration successful! Please check your email for a confirmation link.");
+                
+                // UPDATE UI: Hide form and show success panel
+                showRegistrationSuccess();
             }
         } else {
-            console.warn("⚠️ User object is null. This can happen if the email is already registered or needs confirmation.");
+            console.warn("⚠️ User object is null. Email might be already registered.");
+            alert("This email might already be registered. Try signing in.");
         }
 
     } catch (error) {
         console.error("💥 CRITICAL REGISTRATION FAILURE:", error.message);
         alert("Registration Failed: " + error.message);
     }
+}
+
+function showRegistrationSuccess() {
+    // Hide the login form and role toggle
+    document.getElementById('loginForm').style.display = 'none';
+    if (document.querySelector('.link-row')) document.querySelector('.link-row').style.display = 'none';
+    if (document.querySelector('.role-toggle')) document.querySelector('.role-toggle').style.display = 'none';
+    if (document.getElementById('adminNote')) document.getElementById('adminNote').style.display = 'none';
+
+    // Show the success panel
+    const panel = document.getElementById('successPanel');
+    panel.style.display = 'flex';
+    
+    // Customize the message for registration
+    document.getElementById('successTitle').textContent = 'Account Created!';
+    document.getElementById('successMsg').textContent = 'Please check your email inbox to confirm your account before logging in.';
+    
+    // Hide the data table since the user isn't logged in yet
+    const table = document.getElementById('userDataTable');
+    if (table) table.style.display = 'none';
 }
