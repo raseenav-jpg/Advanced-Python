@@ -93,16 +93,16 @@ async function performLogin(email, pw, phone, gender) {
 }
 
 function handleLoginSuccess(email, phone, gender, role) {
-    document.getElementById('loginForm').style.display = 'none';
-    const panel = document.getElementById('successPanel');
-    panel.style.display = 'flex';
-
     if (role === 'admin') {
-        document.getElementById('successTitle').textContent = 'Admin Access Granted';
-        const table = document.getElementById('userDataTable');
-        if (table) table.style.display = 'block';
-        document.getElementById('dEmail').textContent = email;
+        console.log("🛡️ Admin detected. Redirecting to Dashboard...");
+        window.location.href = 'admin/dashboard.html';
     } else {
+        console.log("👤 Standard User detected. Showing User Panel...");
+        document.getElementById('loginForm').style.display = 'none';
+        if (document.querySelector('.link-row')) document.querySelector('.link-row').style.display = 'none';
+        
+        const panel = document.getElementById('successPanel');
+        panel.style.display = 'flex';
         document.getElementById('successTitle').textContent = 'Welcome Back!';
     }
 }
