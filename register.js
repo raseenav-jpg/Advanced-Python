@@ -1,9 +1,8 @@
 // register.js - Supabase Registration Logic
 
 async function signUpUser(email, password, phone, gender) {
-    // Safety check: Ensure supabase is initialized
     if (!window.supabase) {
-        console.error("Supabase client not initialized. Check your index.html head.");
+        alert("Supabase not initialized.");
         return;
     }
 
@@ -18,10 +17,8 @@ async function signUpUser(email, password, phone, gender) {
 
         const user = data.user;
 
-        // Note: If email confirmation is ON, user.id might exist but the user 
-        // won't be "logged in" until they click the link in their email.
+        // 2. Create the profile in the 'profiles' table
         if (user) {
-            // 2. Insert profile data into 'profiles' table
             const { error: profileError } = await supabase
                 .from('profiles')
                 .insert([
@@ -30,21 +27,20 @@ async function signUpUser(email, password, phone, gender) {
                         email: email, 
                         phone: phone, 
                         gender: gender,
-                        role: 'user' 
+                        role: 'user' // Default to user, Admin must be set manually in DB
                     }
                 ]);
 
             if (profileError) {
-                // If the table 'profiles' doesn't exist yet, this will fail.
-                console.error("Error saving profile:", profileError.message);
-                alert("Auth successful, but profile saving failed. Did you create the 'profiles' table?");
+                console.error("Profile creation error:", profileError.message);
+                alert("Auth successful, but profile creation failed. Check if 'profiles' table exists.");
             } else {
-                alert("Registration successful! Check your email for a confirmation link.");
+                alert("Registration successful! Please check your email for confirmation.");
             }
         }
 
     } catch (error) {
-        console.error("Registration failed:", error.message);
-        alert("Registration Error: " + error.message);
+        console.error("Registration Error:", error.message);
+        alert("Registration Failed: " + error.message);
     }
 }
