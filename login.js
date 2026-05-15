@@ -93,11 +93,18 @@ async function performLogin(email, pw, phone, gender) {
 }
 
 function handleLoginSuccess(email, phone, gender, role) {
+    console.log("🕵️ Role check in progress... User role is:", role);
+    
     if (role === 'admin') {
-        console.log("🛡️ Admin detected. Redirecting to Dashboard...");
-        window.location.href = 'admin/dashboard.html';
+        console.log("🛡️ SUCCESS: Admin detected. Redirecting to Dashboard...");
+        try {
+            window.location.href = 'admin/dashboard.html';
+        } catch (err) {
+            console.error("❌ Redirection failed:", err);
+            alert("Could not find admin/dashboard.html. Please check if the folder exists.");
+        }
     } else {
-        console.log("👤 Standard User detected. Showing User Panel...");
+        console.log("👤 USER: Standard student detected. Showing User Panel.");
         document.getElementById('loginForm').style.display = 'none';
         if (document.querySelector('.link-row')) document.querySelector('.link-row').style.display = 'none';
         
