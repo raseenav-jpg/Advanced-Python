@@ -7,8 +7,8 @@
 
     <script>
         // REPLACE THESE with your actual values from Supabase Project Settings > API
-        const SUPABASE_URL = 'https://your-project.supabase.co';
-        const SUPABASE_ANON_KEY = 'your-anon-key';
+        const SUPABASE_URL = 'https://mmmggjhgfmkhnzubkoib.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWdnamhnZm1raG56dWJrb2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MzU0NzgsImV4cCI6MjA5NDQxMTQ3OH0.RgLR8AYaHwXJncqzL4zVmvQMrlg2BUkH7IFGIzyC0kU';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // Rename the global variable to avoid conflict with the library name 'supabase'
         window.supabase = supabaseClient;
@@ -51,8 +51,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px; /* Added padding for mobile breathing room */
-            overflow-x: hidden; /* Prevent horizontal scroll, allow vertical */
+            overflow: hidden;
             position: relative;
         }
 
@@ -103,11 +102,6 @@
             padding: 48px 44px;
             width: 100%;
             max-width: 460px;
-
-            /* Responsive padding for smaller screens */
-            @media (max-width: 480px) {
-                padding: 32px 24px;
-            }
             position: relative;
             z-index: 10;
             box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
@@ -526,215 +520,194 @@
     </style>
 </head>
 
-            <body>
+<body>
 
-                <div class="card" id="mainCard">
+    <div class="card" id="mainCard">
 
         <!-- Role toggle -->
-                    <div class="role-toggle">
-                        <button class="role-btn active" id="userBtn" onclick="setRole('user')">👤 User</button>
-                        <button class="role-btn" id="adminBtn" onclick="setRole('admin')">🛡️ Admin</button>
-                    </div>
+        <div class="role-toggle">
+            <button class="role-btn active" id="userBtn" onclick="setRole('user')">👤 User</button>
+            <button class="role-btn" id="adminBtn" onclick="setRole('admin')">🛡️ Admin</button>
+        </div>
 
-                    <!-- Header -->
-                    <div class="header">
-                        <h1>Welcome back<span class="accent-dot">.</span></h1>
-                        <p id="subText">Sign in to your account to continue</p>
-                    </div>
+        <!-- Header -->
+        <div class="header">
+            <h1>Welcome back<span class="accent-dot">.</span></h1>
+            <p id="subText">Sign in to your account to continue</p>
+        </div>
 
-                    <!-- Admin note -->
-                    <div class="admin-note" id="adminNote">
-                        ⚠️ Admin access grants full visibility into all registered user data. Use responsibly.
-                    </div>
+        <!-- Admin note -->
+        <div class="admin-note" id="adminNote">
+            ⚠️ Admin access grants full visibility into all registered user data. Use responsibly.
+        </div>
 
-                    <!-- Form -->
-                    <form id="loginForm" novalidate>
+        <!-- Form -->
+        <form id="loginForm" novalidate>
 
-                        <!-- Email -->
-                        <div class="field">
-                            <label>Email Address</label>
-                            <div class="field-wrap">
-                                <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
-                            </div>
-                            <div class="err" id="emailErr">⚠ Please enter a valid email address</div>
-                        </div>
-
-                        <!-- Password -->
-                        <div class="field">
-                            <label>Password</label>
-                            <div class="field-wrap">
-                                <input type="password" id="password" placeholder="Min 8 chars, 1 symbol"
-                                    autocomplete="current-password" />
-                                <button type="button" class="toggle-pw" onclick="togglePw()" id="pwEye">👁</button>
-                            </div>
-                            <div class="pw-strength" id="pwStrength">
-                                <div class="pw-bar" id="bar1"></div>
-                                <div class="pw-bar" id="bar2"></div>
-                                <div class="pw-bar" id="bar3"></div>
-                            </div>
-                            <div class="err" id="pwErr">⚠ Min 8 characters with at least one symbol (!@#$...)</div>
-                        </div>
-
-                        <!-- Phone -->
-                        <div class="field">
-                            <label>Phone Number</label>
-                            <div class="phone-wrap">
-                                <div class="prefix-box">🇮🇳 +91</div>
-                                <input type="tel" id="phone" placeholder="10-digit number" maxlength="10" />
-                            </div>
-                            <div class="err" id="phoneErr">⚠ Enter a valid 10-digit phone number</div>
-                        </div>
-
-                        <!-- Gender -->
-                        <div class="field">
-                            <label>Gender</label>
-                            <div class="select-wrap field-wrap">
-                                <select id="gender">
-                                    <option value="">— Select gender —</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="non-binary">Non-binary</option>
-                                    <option value="prefer-not">Prefer not to say</option>
-                                </select>
-                            </div>
-                            <div class="err" id="genderErr">⚠ Please select your gender</div>
-                        </div>
-
-                        <div class="divider"></div>
-
-                        <button type="submit" class="btn" id="submitBtn">Sign In</button>
-                    </form>
-
-                    <div class="link-row" id="toggleRow">Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Create one →</a></div>
-
-                    <!-- Success panel (hidden initially) -->
-                    <div class="success-panel" id="successPanel">
-                        <div class="check-circle">✓</div>
-                        <h2 id="successTitle">Signed In!</h2>
-                        <p id="successMsg">You have been authenticated successfully.</p>
-                        <!-- Admin data table (only shown for admin) -->
-                        <div class="user-data-table" id="userDataTable" style="display:none;">
-                            <div class="row"><span class="key">Email</span><span class="val" id="dEmail">—</span></div>
-                            <div class="row"><span class="key">Phone</span><span class="val" id="dPhone">—</span></div>
-                            <div class="row"><span class="key">Gender</span><span class="val" id="dGender">—</span></div>
-                            <div class="row"><span class="key">Role</span><span class="val"><span
-                                class="badge admin-badge">Admin</span></span></div>
-                            <div class="row"><span class="key">Login Time</span><span class="val" id="dTime">—</span></div>
-                        </div>
-                        <button class="btn" style="margin-top:16px; width:100%;" onclick="resetForm()">← Back to Login</button>
-                    </div>
-
+            <!-- Email -->
+            <div class="field">
+                <label>Email Address</label>
+                <div class="field-wrap">
+                    <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
                 </div>
+                <div class="err" id="emailErr">⚠ Please enter a valid email address</div>
+            </div>
 
-                <script>
-                    let currentRole = 'user';
+            <!-- Password -->
+            <div class="field">
+                <label>Password</label>
+                <div class="field-wrap">
+                    <input type="password" id="password" placeholder="Min 8 chars, 1 symbol"
+                        autocomplete="current-password" />
+                    <button type="button" class="toggle-pw" onclick="togglePw()" id="pwEye">👁</button>
+                </div>
+                <div class="pw-strength" id="pwStrength">
+                    <div class="pw-bar" id="bar1"></div>
+                    <div class="pw-bar" id="bar2"></div>
+                    <div class="pw-bar" id="bar3"></div>
+                </div>
+                <div class="err" id="pwErr">⚠ Min 8 characters with at least one symbol (!@#$...)</div>
+            </div>
 
-                    function setRole(role) {
-                        currentRole = role;
-                    const card = document.getElementById('mainCard');
-                    const note = document.getElementById('adminNote');
-                    const uBtn = document.getElementById('userBtn');
-                    const aBtn = document.getElementById('adminBtn');
-                    const sub = document.getElementById('subText');
+            <!-- Phone -->
+            <div class="field">
+                <label>Phone Number</label>
+                <div class="phone-wrap">
+                    <div class="prefix-box">🇮🇳 +91</div>
+                    <input type="tel" id="phone" placeholder="10-digit number" maxlength="10" />
+                </div>
+                <div class="err" id="phoneErr">⚠ Enter a valid 10-digit phone number</div>
+            </div>
 
-                    if (role === 'admin') {
-                        card.classList.add('admin-mode');
-                    note.classList.add('show');
-                    aBtn.classList.add('active', 'admin-active');
-                    uBtn.classList.remove('active');
-                    sub.textContent = 'Admin portal — full user data access';
+            <!-- Gender -->
+            <div class="field">
+                <label>Gender</label>
+                <div class="select-wrap field-wrap">
+                    <select id="gender">
+                        <option value="">— Select gender —</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="non-binary">Non-binary</option>
+                        <option value="prefer-not">Prefer not to say</option>
+                    </select>
+                </div>
+                <div class="err" id="genderErr">⚠ Please select your gender</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <button type="submit" class="btn" id="submitBtn">Sign In</button>
+        </form>
+
+        <div class="link-row">Don't have an account? <a href="#">Create one →</a></div>
+
+        <!-- Success panel (hidden initially) -->
+        <div class="success-panel" id="successPanel">
+            <div class="check-circle">✓</div>
+            <h2 id="successTitle">Signed In!</h2>
+            <p id="successMsg">You have been authenticated successfully.</p>
+            <!-- Admin data table (only shown for admin) -->
+            <div class="user-data-table" id="userDataTable" style="display:none;">
+                <div class="row"><span class="key">Email</span><span class="val" id="dEmail">—</span></div>
+                <div class="row"><span class="key">Phone</span><span class="val" id="dPhone">—</span></div>
+                <div class="row"><span class="key">Gender</span><span class="val" id="dGender">—</span></div>
+                <div class="row"><span class="key">Role</span><span class="val"><span
+                            class="badge admin-badge">Admin</span></span></div>
+                <div class="row"><span class="key">Login Time</span><span class="val" id="dTime">—</span></div>
+            </div>
+            <button class="btn" style="margin-top:16px; width:100%;" onclick="resetForm()">← Back to Login</button>
+        </div>
+
+    </div>
+
+    <script>
+        let currentRole = 'user';
+
+        function setRole(role) {
+            currentRole = role;
+            const card = document.getElementById('mainCard');
+            const note = document.getElementById('adminNote');
+            const uBtn = document.getElementById('userBtn');
+            const aBtn = document.getElementById('adminBtn');
+            const sub = document.getElementById('subText');
+
+            if (role === 'admin') {
+                card.classList.add('admin-mode');
+                note.classList.add('show');
+                aBtn.classList.add('active', 'admin-active');
+                uBtn.classList.remove('active');
+                sub.textContent = 'Admin portal — full user data access';
             } else {
-                        card.classList.remove('admin-mode');
-                    note.classList.remove('show');
-                    uBtn.classList.add('active');
-                    aBtn.classList.remove('active', 'admin-active');
-                    sub.textContent = 'Sign in to your account to continue';
+                card.classList.remove('admin-mode');
+                note.classList.remove('show');
+                uBtn.classList.add('active');
+                aBtn.classList.remove('active', 'admin-active');
+                sub.textContent = 'Sign in to your account to continue';
             }
         }
 
-                    // Password visibility
-                    function togglePw() {
+        // Password visibility
+        function togglePw() {
             const pw = document.getElementById('password');
-                    const eye = document.getElementById('pwEye');
-                    pw.type = pw.type === 'password' ? 'text' : 'password';
-                    eye.textContent = pw.type === 'password' ? '👁' : '🙈';
+            const eye = document.getElementById('pwEye');
+            pw.type = pw.type === 'password' ? 'text' : 'password';
+            eye.textContent = pw.type === 'password' ? '👁' : '🙈';
         }
 
-                    // Password strength indicator
-                    document.getElementById('password').addEventListener('input', function () {
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function () {
             const val = this.value;
             const hasLen = val.length >= 8;
-                    const hasSymbol = /[!@#$%^&*(),.?":{ }|<>\-_=+\[\]\\\/~`]/.test(val);
-                        const hasNum = /\d/.test(val);
-                        const hasUpper = /[A-Z]/.test(val);
+            const hasSymbol = /[!@#$%^&*(),.?":{ }|<>\-_=+\[\]\\\/~`]/.test(val);
+            const hasNum = /\d/.test(val);
+            const hasUpper = /[A-Z]/.test(val);
 
-                        const score = [hasLen, hasSymbol, hasNum && hasUpper].filter(Boolean).length;
-                        const bars = ['bar1', 'bar2', 'bar3'];
-                        const cls = ['weak', 'medium', 'strong'];
+            const score = [hasLen, hasSymbol, hasNum && hasUpper].filter(Boolean).length;
+            const bars = ['bar1', 'bar2', 'bar3'];
+            const cls = ['weak', 'medium', 'strong'];
 
             bars.forEach((id, i) => {
                 const el = document.getElementById(id);
-                        el.className = 'pw-bar';
-                        if (i < score) el.classList.add(cls[score - 1]);
+                el.className = 'pw-bar';
+                if (i < score) el.classList.add(cls[score - 1]);
             });
         });
 
-                        // Phone: digits only
-                        document.getElementById('phone').addEventListener('input', function () {
-                            this.value = this.value.replace(/\D/g, '').slice(0, 10);
+        // Phone: digits only
+        document.getElementById('phone').addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 10);
         });
 
-                        // Validation helpers
-                        function showErr(id, show) {
+        // Validation helpers
+        function showErr(id, show) {
             const el = document.getElementById(id);
-                        show ? el.classList.add('show') : el.classList.remove('show');
+            show ? el.classList.add('show') : el.classList.remove('show');
         }
-                        function markField(fieldId, isError) {
+        function markField(fieldId, isError) {
             const el = document.getElementById(fieldId);
-                        isError ? el.classList.add('error-field') : el.classList.remove('error-field');
+            isError ? el.classList.add('error-field') : el.classList.remove('error-field');
         }
 
-                        function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-                        function validatePassword(v) { return v.length >= 8 && /[!@#$%^&*(),.?":{ }|<>\-_=+\[\]\\\/~`]/.test(v); }
-                        function validatePhone(v) { return /^\d{10}$/.test(v); }
-
-                    let isRegisterMode = false;
-                    function toggleAuthMode() {
-                        isRegisterMode = !isRegisterMode;
-                        const submitBtn = document.getElementById('submitBtn');
-                        const toggleRow = document.getElementById('toggleRow');
-                        const headerTitle = document.querySelector('.header h1');
-                        const headerSub = document.getElementById('subText');
-
-                        if (isRegisterMode) {
-                            submitBtn.textContent = 'Create Account';
-                            toggleRow.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Sign In →</a>';
-                            headerTitle.innerHTML = 'Join us<span class="accent-dot">.</span>';
-                            headerSub.textContent = 'Enter your details to create an account';
-                        } else {
-                            submitBtn.textContent = 'Sign In';
-                            toggleRow.innerHTML = 'Don\'t have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Create one →</a>';
-                            headerTitle.innerHTML = 'Welcome back<span class="accent-dot">.</span>';
-                            headerSub.textContent = 'Sign in to your account to continue';
-                        }
-                    }
+        function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+        function validatePassword(v) { return v.length >= 8 && /[!@#$%^&*(),.?":{ }|<>\-_=+\[\]\\\/~`]/.test(v); }
+        function validatePhone(v) { return /^\d{10}$/.test(v); }
 
 
 
-                            function resetForm() {
-                                document.getElementById('loginForm').style.display = '';
-                            document.querySelector('.link-row').style.display = '';
-                            document.querySelector('.role-toggle').style.display = '';
-                            document.getElementById('successPanel').style.display = 'none';
-                            document.getElementById('loginForm').reset();
+        function resetForm() {
+            document.getElementById('loginForm').style.display = '';
+            document.querySelector('.link-row').style.display = '';
+            document.querySelector('.role-toggle').style.display = '';
+            document.getElementById('successPanel').style.display = 'none';
+            document.getElementById('loginForm').reset();
             document.querySelectorAll('.pw-bar').forEach(b => b.className = 'pw-bar');
-                            setRole(currentRole);
+            setRole(currentRole);
         }
     </script>
 
     <!-- Link External Logic Files -->
     <script src="login.js"></script>
     <script src="register.js"></script>
-    </body>
+</body>
 
 </html>
