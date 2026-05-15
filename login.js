@@ -76,12 +76,17 @@ async function performLogin(email, pw, phone, gender) {
 
         if (error) throw error;
 
-        console.log("✅ Login successful. Fetching profile...");
+        console.log("✅ Login successful. Fetching profile for ID:", data.user.id);
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', data.user.id)
             .single();
+
+        if (profileError) {
+            console.error("❌ PROFILE FETCH ERROR:", profileError.message);
+            console.warn("ℹ️ Tip: Check if a row exists in the 'profiles' table for this User ID.");
+        }
 
         const userRole = profile ? profile.role : 'user';
         handleLoginSuccess(email, phone, gender, userRole);
