@@ -1,9 +1,36 @@
 // login.js - Supabase Logic (Handles both Login and Register)
 
+// 1. Global state for Auth Mode
+window.isRegisterMode = false;
+
+// 2. Toggle Function (called by the link in index.html)
+window.toggleAuthMode = function() {
+    window.isRegisterMode = !window.isRegisterMode;
+    console.log("🔄 Auth Mode Switched. Is Register Mode:", window.isRegisterMode);
+
+    const submitBtn = document.getElementById('submitBtn');
+    const toggleRow = document.getElementById('toggleRow');
+    const headerTitle = document.querySelector('.header h1');
+    const headerSub = document.getElementById('subText');
+
+    if (window.isRegisterMode) {
+        submitBtn.textContent = 'Create Account';
+        toggleRow.innerHTML = 'Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Sign In →</a>';
+        headerTitle.innerHTML = 'Join us<span class="accent-dot">.</span>';
+        headerSub.textContent = 'Enter your details to create an account';
+    } else {
+        submitBtn.textContent = 'Sign In';
+        toggleRow.innerHTML = 'Don\'t have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Create one →</a>';
+        headerTitle.innerHTML = 'Welcome back<span class="accent-dot">.</span>';
+        headerSub.textContent = 'Sign in to your account to continue';
+    }
+}
+
+// 3. Form Submission Listener
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault();
-    
-    // Safety check
+    console.log("🚀 Form submitted. Mode:", window.isRegisterMode ? "REGISTER" : "LOGIN");
+
     if (!window.supabase) {
         console.error("❌ ERROR: Supabase is not initialized.");
         return;
@@ -14,7 +41,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     const phone = document.getElementById('phone').value.trim();
     const gender = document.getElementById('gender').value;
 
-    // 1. Validation
+    // Validation
     const eE = !validateEmail(email);
     const eP = !validatePassword(pw);
     const ePh = !validatePhone(phone);
@@ -25,78 +52,57 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     showErr('phoneErr', ePh); markField('phone', ePh);
     showErr('genderErr', eG); markField('gender', eG);
 
-    if (eE || eP || ePh || eG) return;
+    if (eE || eP || ePh || eG) {
+        console.warn("⚠️ Validation failed.");
+        return;
+    }
 
-    // 2. Check if we are Registering or Logging in
-    if (isRegisterMode) {
-        console.log("🚀 Switching to Registration Flow...");
-        // Call the function from register.js
+    if (window.isRegisterMode) {
+        console.log("➡️ Executing Registration Flow...");
         signUpUser(email, pw, phone, gender);
     } else {
-        console.log("🔐 Switching to Login Flow...");
+        console.log("➡️ Executing Login Flow...");
         performLogin(email, pw, phone, gender);
     }
 });
 
 async function performLogin(email, pw, phone, gender) {
     try {
-        console.log("🔐 Sending credentials to Supabase Auth...");
+        console.log("🔐 Authenticating with Supabase...");
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: pw,
         });
 
-        if (error) {
-            console.error("❌ AUTH ERROR:", error.message);
-            throw error;
-        }
+        if (error) throw error;
 
-        const user = data.user;
-        console.log("✅ Auth Successful! User ID:", user.id);
-
-        // Fetch the Role (Admin/User) from your 'profiles' table
+        console.log("✅ Login successful. Fetching profile...");
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('role')
-            .eq('id', user.id)
+            .eq('id', data.user.id)
             .single();
 
-        if (profileError) {
-            console.error("❌ DATABASE ERROR (Profiles Table):", profileError.message);
-        }
-
         const userRole = profile ? profile.role : 'user';
-        console.log("👤 Final User Role determined as:", userRole);
-
         handleLoginSuccess(email, phone, gender, userRole);
 
     } catch (error) {
-        console.error("💥 CRITICAL LOGIN FAILURE:", error.message);
+        console.error("❌ LOGIN ERROR:", error.message);
         alert("Login Failed: " + error.message);
     }
 }
 
 function handleLoginSuccess(email, phone, gender, role) {
-    console.log("✨ Transitioning to success UI...");
     document.getElementById('loginForm').style.display = 'none';
-    if (document.querySelector('.link-row')) document.querySelector('.link-row').style.display = 'none';
-    if (document.querySelector('.role-toggle')) document.querySelector('.role-toggle').style.display = 'none';
-    if (document.getElementById('adminNote')) document.getElementById('adminNote').style.display = 'none';
-
     const panel = document.getElementById('successPanel');
     panel.style.display = 'flex';
 
     if (role === 'admin') {
         document.getElementById('successTitle').textContent = 'Admin Access Granted';
-        document.getElementById('successMsg').textContent = 'You have full visibility into user data below.';
         const table = document.getElementById('userDataTable');
         if (table) table.style.display = 'block';
         document.getElementById('dEmail').textContent = email;
-        document.getElementById('dPhone').textContent = '+91 ' + phone;
-        document.getElementById('dGender').textContent = gender.charAt(0).toUpperCase() + gender.slice(1);
-        document.getElementById('dTime').textContent = new Date().toLocaleString('en-IN');
     } else {
         document.getElementById('successTitle').textContent = 'Welcome Back!';
-        document.getElementById('successMsg').textContent = 'You are now signed in as a User.';
     }
 }
