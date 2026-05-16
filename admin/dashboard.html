@@ -24,8 +24,8 @@
             </div>
             <nav>
                 <ul>
-                    <li class="active" onclick="showTab('students')"><span>👥</span> Students</li>
-                    <li onclick="showTab('add')"><span>➕</span> Add Student</li>
+                    <li class="active" onclick="window.location.href='dashboard.html'"><span>👥</span> Students</li>
+                    <li onclick="window.location.href='add-student.html'"><span>➕</span> Add Student</li>
                     <li onclick="logout()"><span>🚪</span> Logout</li>
                 </ul>
             </nav>
@@ -39,7 +39,7 @@
                     <p>Manage your students and academic records</p>
                 </div>
                 <div class="header-right">
-                    <button class="btn btn-primary" onclick="openModal('addModal')">+ New Student</button>
+                    <button class="btn btn-primary" onclick="window.location.href='add-student.html'">+ New Student</button>
                 </div>
             </header>
 
@@ -90,52 +90,6 @@
         </main>
     </div>
 
-    <!-- Add Student Modal -->
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add New Student</h2>
-                <span class="close" onclick="closeModal('addModal')">&times;</span>
-            </div>
-            <form id="addStudentForm" class="modal-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Student ID</label>
-                        <input type="text" id="s_id" placeholder="e.g. STU001" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="s_name" placeholder="John Doe" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="s_email" placeholder="john@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input type="tel" id="s_phone" placeholder="9876543210" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Course</label>
-                        <input type="text" id="s_course" placeholder="B.Tech CS" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Semester</label>
-                        <input type="number" id="s_semester" min="1" max="8" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Address</label>
-                    <textarea id="s_address" rows="3" placeholder="Enter full address..."></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary full-width">Add Student</button>
-            </form>
-        </div>
-    </div>
 
     <!-- Edit Student Modal -->
     <div id="editModal" class="modal">
@@ -168,17 +122,32 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
+                        <label>Gender</label>
+                        <select id="edit_s_gender" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; outline: none;" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Course</label>
                         <input type="text" id="edit_s_course" required>
                     </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group">
                         <label>Semester</label>
-                        <input type="number" id="edit_s_semester" min="1" max="8" required>
+                        <input type="text" id="edit_s_semester" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" id="edit_s_department" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Address</label>
-                    <textarea id="edit_s_address" rows="3"></textarea>
+                    <label>Admission Year</label>
+                    <input type="text" id="edit_s_admission_year" required>
                 </div>
                 <button type="submit" class="btn btn-primary full-width">Update Student</button>
             </form>

@@ -59,7 +59,7 @@ function renderTable(dataList) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><strong>${student.student_id}</strong></td>
-            <td>${student.name}</td>
+            <td>${student.full_name}</td>
             <td>${student.course}</td>
             <td>${student.email}</td>
             <td>
@@ -74,33 +74,6 @@ function renderTable(dataList) {
     });
 }
 
-// 5. Add New Student
-document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const newStudent = {
-        student_id: document.getElementById('s_id').value,
-        name: document.getElementById('s_name').value,
-        email: document.getElementById('s_email').value,
-        phone: document.getElementById('s_phone').value,
-        course: document.getElementById('s_course').value,
-        semester: parseInt(document.getElementById('s_semester').value),
-        address: document.getElementById('s_address').value
-    };
-
-    const { data, error } = await supabase
-        .from('students')
-        .insert([newStudent]);
-
-    if (error) {
-        alert("Error adding student: " + error.message);
-    } else {
-        alert("Student added successfully!");
-        closeModal('addModal');
-        e.target.reset();
-        fetchStudents();
-    }
-});
 
 // 6. Update Student
 async function openEditModal(id) {
@@ -109,12 +82,14 @@ async function openEditModal(id) {
 
     document.getElementById('edit_record_id').value = student.id;
     document.getElementById('edit_s_id').value = student.student_id;
-    document.getElementById('edit_s_name').value = student.name;
+    document.getElementById('edit_s_name').value = student.full_name;
     document.getElementById('edit_s_email').value = student.email;
     document.getElementById('edit_s_phone').value = student.phone;
+    document.getElementById('edit_s_gender').value = student.gender;
     document.getElementById('edit_s_course').value = student.course;
     document.getElementById('edit_s_semester').value = student.semester;
-    document.getElementById('edit_s_address').value = student.address;
+    document.getElementById('edit_s_department').value = student.department;
+    document.getElementById('edit_s_admission_year').value = student.admission_year;
 
     openModal('editModal');
 }
@@ -125,12 +100,14 @@ document.getElementById('editStudentForm').addEventListener('submit', async (e) 
     
     const updatedData = {
         student_id: document.getElementById('edit_s_id').value,
-        name: document.getElementById('edit_s_name').value,
+        full_name: document.getElementById('edit_s_name').value,
         email: document.getElementById('edit_s_email').value,
         phone: document.getElementById('edit_s_phone').value,
+        gender: document.getElementById('edit_s_gender').value,
         course: document.getElementById('edit_s_course').value,
-        semester: parseInt(document.getElementById('edit_s_semester').value),
-        address: document.getElementById('edit_s_address').value
+        semester: document.getElementById('edit_s_semester').value,
+        department: document.getElementById('edit_s_department').value,
+        admission_year: document.getElementById('edit_s_admission_year').value
     };
 
     const { error } = await supabase
@@ -170,12 +147,14 @@ function viewDetails(id) {
 
     const detailHtml = `
         <div class="detail-row"><span class="label">Student ID</span><span class="value">${student.student_id}</span></div>
-        <div class="detail-row"><span class="label">Full Name</span><span class="value">${student.name}</span></div>
+        <div class="detail-row"><span class="label">Full Name</span><span class="value">${student.full_name}</span></div>
         <div class="detail-row"><span class="label">Email</span><span class="value">${student.email}</span></div>
         <div class="detail-row"><span class="label">Phone</span><span class="value">${student.phone}</span></div>
+        <div class="detail-row"><span class="label">Gender</span><span class="value">${student.gender}</span></div>
         <div class="detail-row"><span class="label">Course</span><span class="value">${student.course}</span></div>
         <div class="detail-row"><span class="label">Semester</span><span class="value">${student.semester}</span></div>
-        <div class="detail-row"><span class="label">Address</span><span class="value">${student.address || 'N/A'}</span></div>
+        <div class="detail-row"><span class="label">Department</span><span class="value">${student.department}</span></div>
+        <div class="detail-row"><span class="label">Admission Year</span><span class="value">${student.admission_year}</span></div>
     `;
     document.getElementById('studentDetailView').innerHTML = detailHtml;
     openModal('detailModal');
@@ -185,7 +164,7 @@ function viewDetails(id) {
 function filterStudents() {
     const query = document.getElementById('studentSearch').value.toLowerCase();
     const filtered = students.filter(s => 
-        s.name.toLowerCase().includes(query) || 
+        s.full_name.toLowerCase().includes(query) || 
         s.student_id.toLowerCase().includes(query) || 
         s.email.toLowerCase().includes(query)
     );

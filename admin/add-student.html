@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Student | Admin Dashboard</title>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://mmmggjhgfmkhnzubkoib.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWdnamhnZm1raG56dWJrb2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MzU0NzgsImV4cCI6MjA5NDQxMTQ3OH0.RgLR8AYaHwXJncqzL4zVmvQMrlg2BUkH7IFGIzyC0kU';
+        window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="css/add-student.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <h2>EduManage</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li onclick="window.location.href='dashboard.html'"><span>👥</span> Students</li>
+                    <li class="active" onclick="window.location.href='add-student.html'"><span>➕</span> Add Student</li>
+                    <li onclick="logout()"><span>🚪</span> Logout</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <div class="header-left">
+                    <h1>Add New Student</h1>
+                    <p>Enter the student details to register them in the system.</p>
+                </div>
+            </header>
+
+            <section class="form-section">
+                <div class="card">
+                    <form id="addStudentForm">
+                        <div id="formMessage" class="message hidden"></div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="student_id">Student ID</label>
+                                <input type="text" id="student_id" placeholder="e.g. STU1001" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="full_name">Full Name</label>
+                                <input type="text" id="full_name" placeholder="John Doe" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" placeholder="john@example.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" placeholder="9876543210" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <div class="select-wrapper">
+                                    <select id="gender" required>
+                                        <option value="" disabled selected>Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="course">Course</label>
+                                <input type="text" id="course" placeholder="e.g. B.Tech" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="semester">Semester</label>
+                                <input type="text" id="semester" placeholder="e.g. 1st Semester" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <input type="text" id="department" placeholder="e.g. Computer Science" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="admission_year">Admission Year</label>
+                                <input type="number" id="admission_year" min="2000" max="2100" placeholder="e.g. 2024" required>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="reset" class="btn btn-secondary">Reset</button>
+                            <button type="submit" class="btn btn-primary" id="saveBtn">
+                                <span class="btn-text">Save Student</span>
+                                <div class="spinner hidden" id="loadingSpinner"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/add-student.js"></script>
+</body>
+</html>
