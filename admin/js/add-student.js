@@ -2,33 +2,9 @@
 
 const supabase = window.supabase;
 
-// Auth Guard: Ensure only Admins can access this page
-async function checkAdmin() {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-        window.location.href = '../index.html';
-        return;
-    }
 
-    // Double check role from profiles table (optional, based on existing logic)
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
 
-    if (!profile || profile.role !== 'admin') {
-        alert("Access Denied: Admins Only");
-        window.location.href = '../index.html';
-    }
-}
 
-// Logout function
-async function logout() {
-    await supabase.auth.signOut();
-    window.location.href = '../index.html';
-}
 
 // UI Helpers
 function showMessage(msg, type) {
@@ -126,5 +102,4 @@ document.getElementById('addStudentForm').addEventListener('submit', async (e) =
     }
 });
 
-// Initialize
-checkAdmin();
+

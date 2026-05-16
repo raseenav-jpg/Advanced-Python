@@ -319,10 +319,54 @@ td {
     font-weight: 500;
 }
 
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast {
+    min-width: 250px;
+    padding: 16px 24px;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    transform: translateX(120%);
+    animation: slideIn 0.3s forwards ease-out;
+    border-left: 4px solid transparent;
+}
+
+.toast.success {
+    border-left-color: var(--success);
+}
+
+.toast.error {
+    border-left-color: var(--danger);
+}
+
+@keyframes slideIn {
+    to { transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; transform: translateX(20px); }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .sidebar { width: 70px; padding: 20px 10px; }
     .sidebar h2, .sidebar li span:last-child { display: none; }
     .main-content { margin-left: 70px; padding: 20px; }
     .modal-form .form-row { grid-template-columns: 1fr; }
+    .toast-container { bottom: 16px; right: 16px; left: 16px; }
+    .toast { width: 100%; min-width: unset; }
 }
