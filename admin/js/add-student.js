@@ -1,6 +1,6 @@
 // add-student.js
 
-const supabase = window.supabase;
+const supabase = window.supabaseClient;
 
 
 

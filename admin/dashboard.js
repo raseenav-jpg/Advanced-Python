@@ -26,7 +26,7 @@ function showToast(message, type = 'success') {
 // 2. Fetch Students from Database
 async function fetchStudents() {
     console.log("📂 Fetching students...");
-    const { data, error } = await window.supabase
+    const { data, error } = await window.supabaseClient
         .from('students')
         .select('*')
         .order('created_at', { ascending: false });
@@ -117,7 +117,7 @@ document.getElementById('editStudentForm').addEventListener('submit', async (e) 
     try {
         // Optional: Check if the new ID or Email already exists for a DIFFERENT student
         // Assuming the user knows what they are doing for now to keep it simple, but we rely on Supabase unique constraints
-        const { error } = await window.supabase
+        const { error } = await window.supabaseClient
             .from('students')
             .update(updatedData)
             .eq('id', id);
@@ -143,7 +143,7 @@ async function deleteStudent(id) {
     if (!confirm("Are you sure you want to delete this student? This action cannot be undone.")) return;
 
     try {
-        const { error } = await window.supabase
+        const { error } = await window.supabaseClient
             .from('students')
             .delete()
             .eq('id', id);
